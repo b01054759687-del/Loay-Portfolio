@@ -1,15 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { profile } from "@/lib/data";
 
 const links = [
-  { label: "About", href: "#about" },
-  { label: "Projects", href: "#projects" },
-  { label: "Skills", href: "#skills" },
-  { label: "Contact", href: "#contact" },
+  { label: "Impact", href: "/#impact" },
+  { label: "Case Studies", href: "/#case-studies" },
 ];
 
 export default function Navbar() {
@@ -18,9 +17,9 @@ export default function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-40 backdrop-blur-md bg-background/70 border-b border-border">
       <nav className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
-        <a href="#top" className="font-semibold tracking-tight">
+        <Link href="/#top" className="font-semibold tracking-tight">
           {profile.name}
-        </a>
+        </Link>
 
         <ul className="hidden md:flex items-center gap-8 text-sm text-muted">
           {links.map((link) => (
@@ -33,15 +32,15 @@ export default function Navbar() {
         </ul>
 
         <a
-          href="#contact"
+          href={profile.ctaSecondary.href}
           className="hidden md:inline-flex text-sm px-4 py-2 rounded-full bg-foreground text-background font-medium hover:opacity-90 transition-opacity"
         >
-          Let&apos;s talk
+          {profile.ctaSecondary.label}
         </a>
 
         <button
           onClick={() => setOpen((v) => !v)}
-          className="md:hidden p-2 -mr-2"
+          className="md:hidden p-3 -mr-3"
           aria-label="Toggle menu"
         >
           {open ? <X size={22} /> : <Menu size={22} />}
@@ -69,6 +68,15 @@ export default function Navbar() {
                   </a>
                 </li>
               ))}
+              <li>
+                <a
+                  href={profile.ctaSecondary.href}
+                  onClick={() => setOpen(false)}
+                  className="hover:text-foreground transition-colors"
+                >
+                  {profile.ctaSecondary.label}
+                </a>
+              </li>
             </ul>
           </motion.div>
         )}

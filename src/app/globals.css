@@ -1,20 +1,31 @@
 @import "tailwindcss";
 
+/*
+  Design system: 70% premium executive consulting, 30% applied-technology.
+  Neutral charcoal/paper base carries the executive weight; a single
+  confident signal color (--accent) marks data, proof and interactivity;
+  a secondary warm tone (--accent-warm) is reserved for metrics/outcomes
+  so the numbers read as the hero, not the chrome.
+*/
 :root {
-  --background: #0a0a0f;
-  --foreground: #f5f5f7;
-  --muted: #9a9aa8;
-  --accent: #7c5cff;
-  --accent-2: #22d3ee;
-  --border: #1f1f2a;
+  --background: #0a0a0c;
+  --surface: #131317;
+  --surface-2: #1a1a20;
+  --foreground: #f3f2ee;
+  --muted: #96969f;
+  --accent: #4f6bff;
+  --accent-warm: #d7a44f;
+  --border: #232329;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
-  --color-accent-2: var(--accent-2);
+  --color-accent-warm: var(--accent-warm);
   --color-border: var(--border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -52,10 +63,15 @@ body {
 }
 
 .text-gradient {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  background: linear-gradient(90deg, var(--foreground), var(--accent));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+.text-metric {
+  color: var(--accent-warm);
+  font-variant-numeric: tabular-nums;
 }
 
 @keyframes marquee {

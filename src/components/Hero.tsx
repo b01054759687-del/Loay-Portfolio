@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion, type Variants } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import { profile } from "@/lib/data";
@@ -29,9 +30,25 @@ export default function Hero() {
       className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-24 overflow-hidden"
     >
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full bg-accent/30 blur-[100px] animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-72 h-72 rounded-full bg-accent-2/20 blur-[100px] animate-pulse" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(79,107,255,0.14),transparent_55%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] bg-[size:64px_64px] opacity-[0.15] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_30%,black,transparent)]" />
       </div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.92 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }}
+        className="relative mb-6 h-28 w-28 sm:h-32 sm:w-32 overflow-hidden rounded-full ring-1 ring-accent/30 shadow-[0_0_40px_-10px_rgba(79,107,255,0.35)]"
+      >
+        <Image
+          src="/images/loay-portrait.jpg"
+          alt={profile.name}
+          fill
+          priority
+          sizes="128px"
+          className="object-cover object-top"
+        />
+      </motion.div>
 
       <motion.p
         initial={{ opacity: 0, y: 10 }}
@@ -50,7 +67,7 @@ export default function Hero() {
       >
         {headline.map((w, i) => (
           <motion.span key={i} variants={word} className="inline-block mr-3">
-            {i === headline.length - 1 ? (
+            {["Media,", "Data", "&", "AI"].includes(w) ? (
               <span className="text-gradient">{w}</span>
             ) : (
               w
@@ -59,23 +76,32 @@ export default function Hero() {
         ))}
       </motion.h1>
 
+      <motion.p
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className="mt-8 max-w-2xl text-center text-base sm:text-lg text-muted leading-relaxed"
+      >
+        {profile.supportingText}
+      </motion.p>
+
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.6 }}
-        className="mt-10 flex gap-4"
+        className="mt-10 flex flex-wrap justify-center gap-4"
       >
         <a
-          href="#projects"
+          href={profile.ctaPrimary.href}
           className="px-6 py-3 rounded-full bg-foreground text-background font-medium hover:opacity-90 transition-opacity"
         >
-          View my work
+          {profile.ctaPrimary.label}
         </a>
         <a
-          href="#contact"
+          href={profile.ctaSecondary.href}
           className="px-6 py-3 rounded-full border border-border hover:border-foreground/50 transition-colors"
         >
-          Get in touch
+          {profile.ctaSecondary.label}
         </a>
       </motion.div>
 

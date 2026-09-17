@@ -1,75 +1,100 @@
+// All facts on this page are sourced from /source-material (CV, PlanSee
+// business-contribution review, Agentic AI forensic audit). Nothing here is
+// invented — see each export for its source. Anything not yet supported by
+// source material is marked PLACEHOLDER and must be resolved before Phase 2.
+
 export const profile = {
-  name: "Your Name",
-  role: "Product Designer & Frontend Developer",
-  tagline: "I design and build interfaces that feel alive.",
-  location: "Cairo, Egypt",
-  email: "you@example.com",
-  socials: [
-    { label: "GitHub", url: "https://github.com/yourname" },
-    { label: "LinkedIn", url: "https://linkedin.com/in/yourname" },
-    { label: "Dribbble", url: "https://dribbble.com/yourname" },
-  ],
+  name: "Loay Ashraf",
+  role: "Performance Marketing Specialist",
+  tagline: "Building Growth Systems Through Media, Data & AI",
+  supportingText:
+    "I build measurable marketing systems that connect paid acquisition, analytics, CRM automation, and AI-powered workflows — turning media spend into qualified pipeline sales can act on.",
+  location: "Cairo, Egypt", // PLACEHOLDER: exact city not stated in CV; Egypt is confirmed via employers
+  email: "louyashra@gmail.com",
+  phone: "+20 111 957 4917",
+  linkedin: "https://www.linkedin.com/in/louy-ashraf",
+  ctaPrimary: { label: "View Case Studies", href: "/#case-studies" },
+  ctaSecondary: { label: "Let's Discuss Growth", href: "mailto:louyashra@gmail.com" },
 };
 
-export const about = {
-  paragraphs: [
-    "I'm a designer-developer hybrid who spends equal time in Figma and in code. I care about the small details — the easing curve on a hover state, the way a section reveals itself as you scroll.",
-    "Over the past few years I've worked on SaaS dashboards, marketing sites, and interactive product experiences, always pushing for interfaces that feel considered rather than default.",
-  ],
-  stats: [
-    { label: "Years experience", value: "4+" },
-    { label: "Projects shipped", value: "30+" },
-    { label: "Happy clients", value: "20+" },
-  ],
+export type ImpactMetric = {
+  value: string;
+  label: string;
+  context: string;
 };
 
-export const skills = [
-  "Figma",
-  "React",
-  "Next.js",
-  "TypeScript",
-  "Tailwind CSS",
-  "GSAP",
-  "Framer Motion",
-  "Three.js",
-  "Node.js",
-  "UI/UX Design",
+// Source: CV "Senior Marketing Specialist" bullet (Apr 2025 – Feb 2026) and
+// PlanSee Business Contribution Review, Appendix 1 (verified-results.md).
+export const impactMetrics: ImpactMetric[] = [
+  { value: "EGP 2.29M", label: "Paid media spend managed", context: "Meta & TikTok, Apr 2025 – Feb 2026" },
+  { value: "1,982", label: "Qualified leads", context: "Verified in HubSpot CRM" },
+  { value: "392", label: "Meetings", context: "Campaign-attributed" },
+  { value: "72", label: "Deals closed", context: "Campaign-attributed" },
+  { value: "13,377 sqm", label: "Business volume", context: "Campaign-attributed" },
+  { value: ">EGP 1.5M", label: "Annual cost avoidance", context: "Zero-cost Meta + HubSpot + Sheets reporting stack" },
 ];
 
-export type Project = {
+export type CaseStudyStatus = "live" | "coming-soon";
+
+export type CaseStudy = {
+  slug: string;
+  client: string;
   title: string;
-  description: string;
-  tags: string[];
-  link: string;
+  oneLiner: string;
+  status: CaseStudyStatus;
+  focus: string[];
+  href: string;
 };
 
-export const projects: Project[] = [
+export const caseStudies: CaseStudy[] = [
   {
-    title: "Nova Dashboard",
-    description:
-      "An analytics dashboard with real-time charts, dark mode, and micro-interactions across every state.",
-    tags: ["Next.js", "Tailwind", "Framer Motion"],
-    link: "#",
+    slug: "plansee",
+    client: "PlanSee",
+    title: "Building an Acquisition & Intelligence Engine From Zero",
+    oneLiner:
+      "How an unformed marketing function became a measurable, sales-aligned growth system — 1,982 qualified leads, 72 deals.",
+    status: "live",
+    focus: ["Paid media", "Funnel architecture", "CRM automation", "Attribution"],
+    href: "/case-studies/plansee",
   },
   {
-    title: "Aurora Landing",
-    description:
-      "A marketing site with scroll-driven storytelling and a GSAP-powered hero animation.",
-    tags: ["GSAP", "ScrollTrigger", "TypeScript"],
-    link: "#",
+    slug: "markmerce",
+    client: "Markmerce",
+    title: "E-Commerce Growth Through Creative Testing",
+    oneLiner:
+      "Scaling customer acquisition for an e-commerce operation through EGC creative production and full-funnel media buying.",
+    status: "coming-soon",
+    focus: ["EGC creative strategy", "Creative testing", "ROAS improvement", "Revenue impact"],
+    href: "/case-studies/markmerce",
   },
   {
-    title: "Pulse Mobile App",
-    description:
-      "A fitness tracking app UI with fluid gesture-based transitions and shared element animations.",
-    tags: ["React Native", "UI/UX", "Reanimated"],
-    link: "#",
+    slug: "amlaak",
+    client: "Amlaak",
+    title: "Building a Marketing Function From the Ground Up",
+    oneLiner:
+      "Leading team execution, customer targeting, content systems, and BI reporting for a design and finishing business.",
+    status: "coming-soon",
+    focus: ["Team leadership", "Customer targeting", "Content system", "BI dashboards"],
+    href: "/case-studies/amlaak",
   },
   {
-    title: "Orbit Design System",
-    description:
-      "A component library and documentation site used across five internal products.",
-    tags: ["Design System", "Storybook", "Figma"],
-    link: "#",
+    slug: "agentic-ai",
+    client: "Personal Lab",
+    title: "Agentic AI & Cloud Systems",
+    oneLiner:
+      "Multi-agent orchestration, MCP tooling, and cloud applications built to support marketing and business operations.",
+    status: "coming-soon",
+    focus: ["Multi-agent systems", "MCP", "Automation", "Cloud applications", "AI workflows"],
+    href: "/case-studies/agentic-ai",
+  },
+  {
+    slug: "harer",
+    client: "Harer",
+    title: "CRM Retention Strategy",
+    oneLiner:
+      "Diagnosing a dormant customer base and engineering a compliant reactivation strategy.",
+    status: "coming-soon",
+    focus: ["CRM audit", "Customer reactivation", "Regulatory compliance"],
+    href: "/case-studies/harer",
   },
 ];
