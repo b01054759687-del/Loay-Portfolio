@@ -2,12 +2,14 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import type { CaseStudy } from "@/lib/data";
 import { profile } from "@/lib/data";
+import { caseStudyIcons } from "@/lib/case-study-icons";
 
 // Architecture placeholder for a Phase 2 case study. The route, layout, and
 // data contract already exist — only the chapter-by-chapter narrative
 // (built the same way as /case-studies/plansee) is pending source material
 // review and approval.
 export default function CaseStudyPlaceholder({ study }: { study: CaseStudy }) {
+  const Icon = caseStudyIcons[study.slug];
   return (
     <section className="relative px-6 pt-28 pb-24 sm:pt-36 sm:pb-32 min-h-screen">
       <div className="mx-auto max-w-3xl">
@@ -23,7 +25,10 @@ export default function CaseStudyPlaceholder({ study }: { study: CaseStudy }) {
           Coming in Phase 2
         </span>
 
-        <p className="text-sm uppercase tracking-[0.3em] text-muted mb-4">{study.client}</p>
+        <p className="flex items-center gap-2 text-sm uppercase tracking-[0.3em] text-muted mb-4">
+          {Icon && <Icon size={16} className="shrink-0" aria-hidden="true" />}
+          {study.client}
+        </p>
         <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight leading-tight">{study.title}</h1>
         <p className="mt-6 text-lg text-muted leading-relaxed">{study.oneLiner}</p>
 

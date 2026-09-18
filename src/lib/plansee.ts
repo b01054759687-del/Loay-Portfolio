@@ -18,12 +18,24 @@ export type ChapterPoint = {
   detail?: string;
 };
 
+// A strategic decision stated as Decision / Why / Impact, so "why this and
+// not the alternative" is never left implicit. Every triple below is a
+// restatement of sentences already present in this file's chapters — see
+// each chapter's dek/points for the same claim in its original form.
+export type Decision = {
+  decision: string;
+  why: string;
+  impact: string;
+};
+
 export type Chapter = {
   id: string;
   kicker: string;
   title: string;
+  role: string; // which of the 7 case-study schema elements this scene carries
   dek: string;
   points: ChapterPoint[];
+  decisions?: Decision[];
   stats?: { value: string; label: string }[];
   note?: string;
 };
@@ -32,7 +44,8 @@ export const chapters: Chapter[] = [
   {
     id: "before",
     kicker: "Chapter 1",
-    title: "Before",
+    title: "Empty Space",
+    role: "Business context & challenge",
     dek: "Joined PlanSee while the marketing department was still in its early, unformed stage — and helped build the function rather than inheriting a mature one.",
     points: [
       { label: "No clear operating system or content structure" },
@@ -43,10 +56,11 @@ export const chapters: Chapter[] = [
     ],
   },
   {
-    id: "acquisition-engine",
+    id: "foundation",
     kicker: "Chapter 2",
-    title: "Building the Acquisition Engine",
-    dek: "Full-funnel media buying across Meta and TikTok, structured around a deliberate top-of-funnel / bottom-of-funnel split rather than volume alone.",
+    title: "Foundation",
+    role: "Strategic decisions",
+    dek: "Before any media ran, the funnel itself had to be designed — a deliberate top-of-funnel / bottom-of-funnel structure, not spend allocated by feel.",
     points: [
       {
         label: "TOF — 70–80% of budget",
@@ -56,9 +70,23 @@ export const chapters: Chapter[] = [
         label: "BOF — 15–20% of budget",
         detail: "Retargeting logic with structured content sequencing: testimonial, educational, destination, and branding content.",
       },
+    ],
+    decisions: [
       {
-        label: "Continuous audience research, A/B testing, and creative performance analysis",
+        decision: "Split paid media 70–80% top-of-funnel / 15–20% bottom-of-funnel retargeting, rather than optimizing for volume alone.",
+        why: "Broad reach fills the funnel, but the retargeting stage was converting disproportionately — a volume-only approach would have starved the stage doing more of the closing.",
+        impact: "72.4% incremental uplift in deal volume from retargeting; a 58/42 TOF/BOF deal-origination split.",
       },
+    ],
+  },
+  {
+    id: "growth-engine",
+    kicker: "Chapter 3",
+    title: "Growth Engine",
+    role: "Execution",
+    dek: "Running the funnel structure day to day: continuous audience research, A/B testing, and creative performance analysis kept the TOF/BOF split earning its allocation.",
+    points: [
+      { label: "Continuous audience research, A/B testing, and creative performance analysis across Meta and TikTok" },
     ],
     stats: [
       { value: "72.4%", label: "Incremental uplift in deal volume from retargeting (BOF)" },
@@ -68,27 +96,34 @@ export const chapters: Chapter[] = [
   },
   {
     id: "intelligence-layer",
-    kicker: "Chapter 3",
-    title: "Building the Intelligence Layer",
+    kicker: "Chapter 4",
+    title: "Intelligence Layer",
+    role: "Systems built",
     dek: "Lead operations moved from manual handoffs to a fully automated CRM workflow in three stages, alongside a reporting layer that gave the business decision-grade visibility for the first time.",
     points: [
       { label: "Stage 1 — Sep 2024", detail: "Structured lead sheets and WhatsApp-ready handoffs to sales." },
       { label: "Stage 2 — Jan 2025", detail: "Direct Google Sheets ↔ CRM integration, removing manual sales-side entry." },
       { label: "Stage 3 — Jun 2025", detail: "Full automation: Meta and TikTok Lead Forms route straight into HubSpot with salesperson rotation and instant assignment." },
-      { label: "Meta Conversion API (CAPI) implemented", detail: "Sends CRM qualification status back to Meta, improving the platform's optimization signal." },
       { label: "Custom reporting layer", detail: "Connects Meta, HubSpot, and Google Sheets for live, campaign-level CPQL and meeting-cost visibility." },
+    ],
+    decisions: [
+      {
+        decision: "Feed CRM qualification status back to Meta via Conversion API (CAPI), instead of optimizing purely on raw lead-form volume.",
+        why: "Lead-form volume alone doesn't tell the ad platform which leads actually qualified — feeding that signal back lets the algorithm optimize for quality, not just count.",
+        impact: "20–30% associated reduction in cost per qualified lead after CAPI.",
+      },
     ],
     stats: [
       { value: "30–46 hrs", label: "Released per month across marketing & sales from automation" },
-      { value: "20–30%", label: "Associated reduction in cost per qualified lead after CAPI" },
       { value: ">EGP 1.5M", label: "Annual cost avoided vs. a comparable external BI/reporting setup" },
     ],
     note: "CPQL impact is framed as improved control and discipline from stronger signal quality, not a guaranteed fixed reduction.",
   },
   {
     id: "commercial-impact",
-    kicker: "Chapter 4",
+    kicker: "Chapter 5",
     title: "Commercial Impact",
+    role: "Outcomes",
     dek: "Apr 2025 – Feb 2026: the acquisition engine and intelligence layer converted directly into pipeline and closed business.",
     points: [
       { label: "Peak month: 448 qualified leads in Jun 2025 at EGP 447 cost per qualified lead" },
@@ -103,3 +138,8 @@ export const chapters: Chapter[] = [
     ],
   },
 ];
+
+// "Lessons learned" (the 7th case-study schema element) is deliberately
+// omitted here — there is no source material for it yet, and inventing a
+// retrospective would break this file's evidence-only standard. Add it once
+// Loay provides real content.

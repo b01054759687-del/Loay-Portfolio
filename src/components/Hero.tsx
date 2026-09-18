@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion, type Variants } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import { profile } from "@/lib/data";
@@ -41,7 +42,7 @@ export default function Hero() {
         className="relative mb-6 h-28 w-28 sm:h-32 sm:w-32 overflow-hidden rounded-full ring-1 ring-accent/30 shadow-[0_0_40px_-10px_rgba(79,107,255,0.35)]"
       >
         <Image
-          src="/images/loay-portrait.jpg"
+          src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/images/loay-portrait.jpg`}
           alt={profile.name}
           fill
           priority
@@ -91,12 +92,12 @@ export default function Hero() {
         transition={{ duration: 0.5, delay: 0.6 }}
         className="mt-10 flex flex-wrap justify-center gap-4"
       >
-        <a
+        <Link
           href={profile.ctaPrimary.href}
           className="px-6 py-3 rounded-full bg-foreground text-background font-medium hover:opacity-90 transition-opacity"
         >
           {profile.ctaPrimary.label}
-        </a>
+        </Link>
         <a
           href={profile.ctaSecondary.href}
           className="px-6 py-3 rounded-full border border-border hover:border-foreground/50 transition-colors"

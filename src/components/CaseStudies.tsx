@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { caseStudies } from "@/lib/data";
+import { caseStudyIcons } from "@/lib/case-study-icons";
 
 export default function CaseStudies() {
   return (
@@ -18,7 +19,9 @@ export default function CaseStudies() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {caseStudies.map((study) => (
+          {caseStudies.map((study) => {
+            const Icon = caseStudyIcons[study.slug];
+            return (
             <Link
               key={study.slug}
               href={study.href}
@@ -26,7 +29,10 @@ export default function CaseStudies() {
             >
               <div>
                 <div className="flex items-center justify-between gap-4 mb-4">
-                  <span className="text-sm uppercase tracking-[0.2em] text-muted">{study.client}</span>
+                  <span className="flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-muted">
+                    {Icon && <Icon size={14} className="shrink-0" aria-hidden="true" />}
+                    {study.client}
+                  </span>
                   {study.status === "coming-soon" ? (
                     <span className="text-xs px-2.5 py-1 rounded-full border border-border text-muted">
                       Coming in Phase 2
@@ -56,7 +62,8 @@ export default function CaseStudies() {
                 />
               )}
             </Link>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

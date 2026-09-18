@@ -97,7 +97,7 @@ export default function ImpactMetrics() {
     <section id="impact" className="px-6 py-24 sm:py-32 border-t border-border" ref={sectionRef}>
       <div className="mx-auto max-w-6xl">
         <div className="max-w-2xl mb-14">
-          <p className="text-sm uppercase tracking-[0.3em] text-muted mb-4">Verified Business Impact</p>
+          <p className="text-sm uppercase tracking-[0.3em] text-muted mb-4">Live Readout &mdash; What the Loop Proves</p>
           <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight">
             Marketing measured in business outcomes, not vanity metrics.
           </h2>

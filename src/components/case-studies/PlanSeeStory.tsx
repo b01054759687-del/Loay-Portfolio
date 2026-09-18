@@ -6,13 +6,69 @@ import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { planseeMeta, chapters, type Chapter } from "@/lib/plansee";
 import { profile } from "@/lib/data";
+import { caseStudyIcons } from "@/lib/case-study-icons";
 
 const chapterTint: Record<string, string> = {
   before: "rgba(150,150,159,0.10)",
-  "acquisition-engine": "rgba(79,107,255,0.12)",
+  foundation: "rgba(79,107,255,0.10)",
+  "growth-engine": "rgba(79,107,255,0.14)",
   "intelligence-layer": "rgba(215,164,79,0.12)",
-  "commercial-impact": "rgba(79,107,255,0.16)",
+  "commercial-impact": "rgba(215,164,79,0.16)",
 };
+
+// Blueprint-becomes-built-space motifs, one per scene. Hand-authored line
+// art (no photos, no generated imagery) — each self-draws via
+// stroke-dashoffset as the scene scrolls into view. Lines only; filled
+// shapes fade in with the rest of the scene's [data-reveal] content.
+function SceneMotif({ id }: { id: string }) {
+  const common = { fill: "none" as const, strokeWidth: 1.5 };
+  switch (id) {
+    case "before":
+      return (
+        <svg viewBox="0 0 160 120" className="w-full h-auto" aria-hidden="true">
+          <rect data-motif-line x="10" y="10" width="140" height="100" stroke="var(--border)" strokeDasharray="6 5" {...common} />
+        </svg>
+      );
+    case "foundation":
+      return (
+        <svg viewBox="0 0 160 120" className="w-full h-auto" aria-hidden="true">
+          <rect data-motif-line x="10" y="10" width="140" height="100" stroke="var(--accent)" {...common} />
+          <line data-motif-line x1="10" y1="68" x2="150" y2="68" stroke="var(--accent)" strokeWidth="1" opacity="0.6" />
+          <line data-motif-line x1="45" y1="68" x2="45" y2="110" stroke="var(--accent)" strokeWidth="1" opacity="0.6" />
+          <line data-motif-line x1="80" y1="68" x2="80" y2="110" stroke="var(--accent)" strokeWidth="1" opacity="0.6" />
+          <line data-motif-line x1="115" y1="68" x2="115" y2="110" stroke="var(--accent)" strokeWidth="1" opacity="0.6" />
+        </svg>
+      );
+    case "growth-engine":
+      return (
+        <svg viewBox="0 0 160 120" className="w-full h-auto" aria-hidden="true">
+          <rect data-motif-line x="10" y="10" width="140" height="100" stroke="var(--accent)" {...common} />
+          <polyline data-motif-line points="20,95 50,70 75,82 100,50 130,28" stroke="var(--accent)" strokeWidth="2" fill="none" />
+        </svg>
+      );
+    case "intelligence-layer":
+      return (
+        <svg viewBox="0 0 160 120" className="w-full h-auto" aria-hidden="true">
+          <rect data-motif-line x="10" y="10" width="140" height="100" stroke="var(--accent-warm)" {...common} />
+          <rect data-reveal x="25" y="80" width="12" height="20" fill="var(--accent-warm)" opacity="0.5" />
+          <rect data-reveal x="45" y="65" width="12" height="35" fill="var(--accent-warm)" opacity="0.65" />
+          <rect data-reveal x="65" y="45" width="12" height="55" fill="var(--accent-warm)" opacity="0.8" />
+          <rect data-reveal x="85" y="30" width="12" height="70" fill="var(--accent-warm)" />
+        </svg>
+      );
+    case "commercial-impact":
+      return (
+        <svg viewBox="0 0 160 120" className="w-full h-auto" aria-hidden="true">
+          <rect data-reveal x="10" y="10" width="140" height="100" fill="var(--accent-warm)" opacity="0.1" />
+          <rect data-motif-line x="10" y="10" width="140" height="100" stroke="var(--accent-warm)" {...common} />
+          <line data-motif-line x1="70" y1="10" x2="70" y2="60" stroke="var(--accent-warm)" strokeWidth="1" />
+          <line data-motif-line x1="70" y1="60" x2="150" y2="60" stroke="var(--accent-warm)" strokeWidth="1" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+}
 
 function ChapterSection({ chapter, index }: { chapter: Chapter; index: number }) {
   const ref = useRef<HTMLElement>(null);
@@ -21,32 +77,66 @@ function ChapterSection({ chapter, index }: { chapter: Chapter; index: number })
     const el = ref.current;
     if (!el) return;
 
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        el.querySelectorAll("[data-reveal]"),
-        { opacity: 0, y: 28 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.7,
-          ease: "power3.out",
-          stagger: 0.09,
-          scrollTrigger: { trigger: el, start: "top 70%" },
-        }
-      );
+    const mm = gsap.matchMedia();
 
-      gsap.fromTo(
-        el.querySelector("[data-tint]"),
-        { opacity: 0 },
-        {
-          opacity: 1,
-          duration: 0.8,
-          scrollTrigger: { trigger: el, start: "top 60%", end: "bottom 40%", toggleActions: "play reverse play reverse" },
-        }
-      );
-    }, el);
+    mm.add(
+      {
+        reduced: "(prefers-reduced-motion: reduce)",
+        full: "(prefers-reduced-motion: no-preference)",
+      },
+      (context) => {
+        const { reduced } = context.conditions as { reduced: boolean };
+        const reveals = el.querySelectorAll("[data-reveal]");
+        const tint = el.querySelector("[data-tint]");
+        const motifLines = el.querySelectorAll<SVGGeometryElement>("[data-motif-line]");
 
-    return () => ctx.revert();
+        if (reduced) {
+          gsap.set(reveals, { opacity: 1, y: 0 });
+          gsap.set(tint, { opacity: 1 });
+          gsap.set(motifLines, { strokeDashoffset: 0 });
+          return;
+        }
+
+        gsap.fromTo(
+          reveals,
+          { opacity: 0, y: 28 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: "power3.out",
+            stagger: 0.09,
+            scrollTrigger: { trigger: el, start: "top 70%" },
+          }
+        );
+
+        gsap.fromTo(
+          tint,
+          { opacity: 0 },
+          {
+            opacity: 1,
+            duration: 0.8,
+            scrollTrigger: { trigger: el, start: "top 60%", end: "bottom 40%", toggleActions: "play reverse play reverse" },
+          }
+        );
+
+        motifLines.forEach((line) => {
+          const len = line.getTotalLength();
+          gsap.fromTo(
+            line,
+            { strokeDasharray: len, strokeDashoffset: len },
+            {
+              strokeDashoffset: 0,
+              duration: 1.1,
+              ease: "power2.inOut",
+              scrollTrigger: { trigger: el, start: "top 65%" },
+            }
+          );
+        });
+      }
+    );
+
+    return () => mm.revert();
   }, []);
 
   return (
@@ -64,9 +154,13 @@ function ChapterSection({ chapter, index }: { chapter: Chapter; index: number })
         <div className="lg:sticky lg:top-28 lg:self-start" data-reveal>
           <span className="text-sm text-muted tracking-[0.2em] uppercase">{chapter.kicker}</span>
           <h2 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight">{chapter.title}</h2>
+          <span className="mt-1.5 block text-xs text-muted tracking-[0.15em] uppercase">{chapter.role}</span>
           <span className="mt-4 block text-6xl font-semibold text-border select-none">
             0{index + 1}
           </span>
+          <div className="mt-6 max-w-[160px]">
+            <SceneMotif id={chapter.id} />
+          </div>
         </div>
 
         <div className="min-w-0">
@@ -88,6 +182,31 @@ function ChapterSection({ chapter, index }: { chapter: Chapter; index: number })
               </li>
             ))}
           </ul>
+
+          {chapter.decisions && (
+            <div className="mt-8 space-y-4">
+              {chapter.decisions.map((d) => (
+                <div
+                  key={d.decision}
+                  data-reveal
+                  className="rounded-xl border border-border border-l-[3px] border-l-accent-warm bg-surface overflow-hidden"
+                >
+                  <div className="p-5 border-b border-border">
+                    <span className="text-xs text-accent-warm tracking-[0.15em] uppercase">Decision</span>
+                    <p className="mt-1.5 font-medium">{d.decision}</p>
+                  </div>
+                  <div className="p-5 border-b border-border">
+                    <span className="text-xs text-accent-warm tracking-[0.15em] uppercase">Why</span>
+                    <p className="mt-1.5 text-sm text-muted leading-relaxed">{d.why}</p>
+                  </div>
+                  <div className="p-5">
+                    <span className="text-xs text-accent-warm tracking-[0.15em] uppercase">Impact</span>
+                    <p className="mt-1.5 text-sm text-muted leading-relaxed">{d.impact}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           {chapter.stats && (
             <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-px bg-border rounded-2xl overflow-hidden">
@@ -112,6 +231,8 @@ function ChapterSection({ chapter, index }: { chapter: Chapter; index: number })
     </section>
   );
 }
+
+const PlanSeeIcon = caseStudyIcons.plansee;
 
 export default function PlanSeeStory() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -170,11 +291,12 @@ export default function PlanSeeStory() {
             All case studies
           </Link>
 
-          <p className="text-sm uppercase tracking-[0.3em] text-muted mb-4">
-            {planseeMeta.client} — {planseeMeta.period}
+          <p className="flex items-center gap-2 text-sm uppercase tracking-[0.3em] text-muted mb-4">
+            <PlanSeeIcon size={16} className="shrink-0" aria-hidden="true" />
+            {planseeMeta.client} — {planseeMeta.period} — Interior Design &amp; Finishing
           </p>
           <h1 className="text-4xl sm:text-6xl font-semibold tracking-tight max-w-3xl leading-tight">
-            Building an acquisition &amp; intelligence engine from zero.
+            Blueprint becomes built space: an acquisition &amp; intelligence engine from zero.
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-muted leading-relaxed">
             {planseeMeta.clientDescription} Role: {planseeMeta.role}.
