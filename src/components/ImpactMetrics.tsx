@@ -94,38 +94,36 @@ export default function ImpactMetrics() {
   }, []);
 
   return (
-    <section id="impact" className="px-6 py-24 sm:py-32 border-t border-border" ref={sectionRef}>
-      <div className="mx-auto max-w-6xl">
-        <div className="max-w-2xl mb-14">
-          <p className="text-sm uppercase tracking-[0.3em] text-muted mb-4">Live Readout &mdash; What the Loop Proves</p>
-          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight">
-            Marketing measured in business outcomes, not vanity metrics.
-          </h2>
-          <p className="mt-4 text-muted leading-relaxed">
-            PlanSee, Apr 2025 – Feb 2026 — every figure below is sourced from verified CRM and campaign records.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border rounded-2xl overflow-hidden">
-          {impactMetrics.map((metric) => (
-            <div
-              key={metric.label}
-              data-metric-card
-              className="bg-background p-8 flex flex-col gap-2"
-            >
-              <span
-                data-metric-number
-                data-value={metric.value}
-                className="text-metric text-3xl sm:text-4xl font-semibold tracking-tight"
-              >
-                {metric.value}
-              </span>
-              <span className="font-medium">{metric.label}</span>
-              <span className="text-sm text-muted">{metric.context}</span>
-            </div>
-          ))}
-        </div>
+    <div id="impact" ref={sectionRef}>
+      <div className="max-w-2xl mb-10">
+        <p className="text-sm uppercase tracking-[0.3em] text-muted mb-4">Live Readout &mdash; What the Loop Proves</p>
+        <h3 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight">
+          Marketing measured in business outcomes, not vanity metrics.
+        </h3>
+        <p className="mt-4 text-muted leading-relaxed">
+          PlanSee, Apr 2025 – Feb 2026 — every figure below is sourced from verified CRM and campaign records.
+        </p>
       </div>
-    </section>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border rounded-2xl overflow-hidden">
+        {impactMetrics.map((metric) => (
+          <div
+            key={metric.label}
+            data-metric-card
+            className="bg-background p-8 flex flex-col gap-2"
+          >
+            <span
+              data-metric-number
+              data-value={metric.value}
+              className="text-metric text-3xl sm:text-4xl font-semibold tracking-tight"
+            >
+              {metric.value}
+            </span>
+            <span className="font-medium">{metric.label}</span>
+            <span className="text-sm text-muted">{metric.context}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

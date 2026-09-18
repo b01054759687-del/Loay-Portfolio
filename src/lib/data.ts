@@ -15,6 +15,10 @@ export const profile = {
   linkedin: "https://www.linkedin.com/in/louy-ashraf",
   ctaPrimary: { label: "View Case Studies", href: "/#case-studies" },
   ctaSecondary: { label: "Let's Discuss Growth", href: "mailto:louyashra@gmail.com" },
+  // No CV file exists yet — cvUrl stays undefined until Loay supplies one.
+  // Components should fall back to a "request CV" contact link rather than
+  // a dead download.
+  cvUrl: undefined as string | undefined,
 };
 
 export type ImpactMetric = {

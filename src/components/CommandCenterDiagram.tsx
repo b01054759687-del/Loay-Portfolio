@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
+import ImpactMetrics from "@/components/ImpactMetrics";
 
 // The homepage's operating philosophy: not a dashboard of six tool tiles,
 // a repeating loop of reasoning. The six disciplines only ever appear
@@ -57,12 +58,14 @@ export default function CommandCenterDiagram() {
         const pulses = section.querySelectorAll<SVGCircleElement>("[data-pulse-ring]");
         const signal = section.querySelector<SVGCircleElement>("[data-signal]");
         const sync = section.querySelector<SVGCircleElement>("[data-sync-flash]");
+        const connector = section.querySelector<HTMLElement>("[data-connector-line]");
         const tilt = tiltRef.current;
 
         if (reduced) {
           gsap.set(arcs, { strokeDashoffset: 0 });
           gsap.set(cards, { opacity: 1, y: 0 });
           if (light) gsap.set(light, { opacity: 0 });
+          if (connector) gsap.set(connector, { scaleY: 1 });
           return;
         }
 
@@ -75,6 +78,14 @@ export default function CommandCenterDiagram() {
         if (signal) gsap.set(signal, { attr: { r: 6 }, opacity: 0 });
         if (sync) gsap.set(sync, { attr: { r: 10 }, opacity: 0 });
         if (light) gsap.set(light, { opacity: 0 });
+        if (connector) {
+          gsap.set(connector, { scaleY: 0 });
+          gsap.to(connector, {
+            scaleY: 1,
+            ease: "none",
+            scrollTrigger: { trigger: connector, start: "top 85%", end: "bottom 65%", scrub: 0.6 },
+          });
+        }
 
         const tl = gsap.timeline({
           scrollTrigger: { trigger: section, start: "top 65%" },
@@ -136,6 +147,27 @@ export default function CommandCenterDiagram() {
           );
         }
 
+        // Alive at rest: once the activation sequence lands, the four node
+        // rings keep a slow, low-amplitude breathing loop so the system
+        // never reads as "finished animating" — a running system, not a
+        // diagram that played once.
+        const nodeCircles = section.querySelectorAll<SVGCircleElement>("[data-node-circle]");
+        if (nodeCircles.length) {
+          tl.to(
+            nodeCircles,
+            {
+              attr: { r: 7.5 },
+              opacity: 0.7,
+              duration: 2.2,
+              ease: "sine.inOut",
+              repeat: -1,
+              yoyo: true,
+              stagger: { each: 0.35, from: "start" },
+            },
+            ">-0.2"
+          );
+        }
+
         // Depth: the loop drifts opposite the page scroll (parallax), and
         // gently tilts in 3D toward the cursor — a cheap stand-in for real
         // depth that doesn't require a WebGL scene for a static SVG loop.
@@ -188,7 +220,7 @@ export default function CommandCenterDiagram() {
       <div className="mx-auto max-w-5xl">
         <div className="max-w-2xl mb-14">
           <p className="text-sm uppercase tracking-[0.3em] text-muted mb-4">Operating Philosophy</p>
-          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+          <h2 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight">
             Not a dashboard &mdash; a repeating loop of reasoning.
           </h2>
           <p className="mt-4 text-muted leading-relaxed">
@@ -254,6 +286,7 @@ export default function CommandCenterDiagram() {
                       opacity="0"
                     />
                     <circle
+                      data-node-circle
                       cx={node.x}
                       cy={node.y}
                       r="6"
@@ -296,6 +329,18 @@ export default function CommandCenterDiagram() {
             ))}
           </ol>
         </div>
+
+        {/* The connector: makes the Live Readout read as proof of THIS loop,
+            not a disconnected stats section further down the page. */}
+        <div className="flex flex-col items-center py-14">
+          <div
+            data-connector-line
+            className="h-14 w-px origin-top bg-gradient-to-b from-accent-warm to-transparent"
+          />
+          <p className="mt-3 text-xs uppercase tracking-[0.2em] text-muted">Proven in the loop&rsquo;s own numbers</p>
+        </div>
+
+        <ImpactMetrics />
       </div>
     </section>
   );

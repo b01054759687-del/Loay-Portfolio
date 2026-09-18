@@ -2,14 +2,29 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowUpRight } from "lucide-react";
 import { caseStudies } from "@/lib/data";
 import { caseStudyIcons } from "@/lib/case-study-icons";
 import { worldMotifs } from "@/lib/world-motifs";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
+import type { WorldEnterDetail } from "@/components/WorldTransitionOverlay";
+
+// How long the wash-in plays before the route actually changes underneath
+// it — must stay in step with WorldTransitionOverlay's own wash-in duration.
+const TRANSITION_MS = 380;
 
 export default function CaseStudies() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  function enterWorld(e: React.MouseEvent, slug: string, href: string) {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return; // let modified clicks behave normally
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return; // plain navigation
+    e.preventDefault();
+    window.dispatchEvent(new CustomEvent<WorldEnterDetail>("growth-world-enter", { detail: { slug } }));
+    window.setTimeout(() => router.push(href), TRANSITION_MS);
+  }
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -72,8 +87,8 @@ export default function CaseStudies() {
     <section id="case-studies" ref={sectionRef} className="px-6 py-24 sm:py-32 border-t border-border">
       <div className="mx-auto max-w-6xl">
         <div className="max-w-2xl mb-14">
-          <p className="text-sm uppercase tracking-[0.3em] text-muted mb-4">Growth Worlds</p>
-          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+          <p className="text-sm uppercase tracking-[0.3em] text-muted mb-4">Choose a Growth World</p>
+          <h2 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight">
             Different business, different world — same operating system.
           </h2>
           <p className="mt-4 text-muted leading-relaxed">
@@ -91,6 +106,7 @@ export default function CaseStudies() {
               <Link
                 key={study.slug}
                 href={study.href}
+                onClick={(e) => enterWorld(e, study.slug, study.href)}
                 data-world-card
                 className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border bg-surface min-h-[320px] transition-colors hover:border-foreground/30"
               >
@@ -129,14 +145,12 @@ export default function CaseStudies() {
                       </span>
                     ))}
                   </div>
-                </div>
 
-                {live && (
-                  <ArrowUpRight
-                    size={18}
-                    className="absolute top-8 right-8 text-muted transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-foreground"
-                  />
-                )}
+                  <div className="mt-6 flex items-center gap-2 text-sm font-medium text-muted opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-foreground">
+                    Enter World
+                    <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </div>
+                </div>
               </Link>
             );
           })}

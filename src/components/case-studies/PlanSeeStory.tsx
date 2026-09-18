@@ -79,7 +79,7 @@ function ChapterSection({ chapter }: { chapter: Chapter }) {
       />
       <div data-reveal className="mb-8">
         <span className="text-sm text-muted tracking-[0.2em] uppercase">{chapter.kicker}</span>
-        <h2 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight">{chapter.title}</h2>
+        <h2 className="font-display mt-2 text-3xl sm:text-4xl font-semibold tracking-tight">{chapter.title}</h2>
         <span className="mt-1.5 block text-xs text-muted tracking-[0.15em] uppercase">{chapter.role}</span>
       </div>
 
@@ -204,7 +204,7 @@ export default function PlanSeeStory() {
             <PlanSeeIcon size={16} className="shrink-0" aria-hidden="true" />
             {planseeMeta.client} — {planseeMeta.period} — Interior Design &amp; Finishing
           </p>
-          <h1 className="text-4xl sm:text-6xl font-semibold tracking-tight max-w-3xl leading-tight">
+          <h1 className="font-display text-4xl sm:text-6xl font-semibold tracking-tight max-w-3xl leading-tight">
             Blueprint becomes built space: an acquisition &amp; intelligence engine from zero.
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-muted leading-relaxed">
@@ -242,7 +242,7 @@ export default function PlanSeeStory() {
       {/* Closing */}
       <section className="px-6 py-24 sm:py-32 border-t border-border">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+          <h2 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight">
             The same approach — media, data, and AI working as one system — applies to any growth problem.
           </h2>
           <div className="mt-10 flex flex-wrap justify-center gap-4">

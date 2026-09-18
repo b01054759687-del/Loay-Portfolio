@@ -29,7 +29,7 @@ export default function CaseStudyPlaceholder({ study }: { study: CaseStudy }) {
           {Icon && <Icon size={16} className="shrink-0" aria-hidden="true" />}
           {study.client}
         </p>
-        <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight leading-tight">{study.title}</h1>
+        <h1 className="font-display text-4xl sm:text-5xl font-semibold tracking-tight leading-tight">{study.title}</h1>
         <p className="mt-6 text-lg text-muted leading-relaxed">{study.oneLiner}</p>
 
         <div className="mt-10">

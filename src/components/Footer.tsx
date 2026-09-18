@@ -12,6 +12,18 @@ export default function Footer() {
           <a href={`mailto:${profile.email}`} className="hover:text-foreground transition-colors">
             {profile.email}
           </a>
+          {profile.cvUrl ? (
+            <a href={profile.cvUrl} className="hover:text-foreground transition-colors" target="_blank" rel="noreferrer">
+              CV
+            </a>
+          ) : (
+            <a
+              href={`mailto:${profile.email}?subject=${encodeURIComponent("CV request")}`}
+              className="hover:text-foreground transition-colors"
+            >
+              Request CV
+            </a>
+          )}
         </div>
       </div>
     </footer>
