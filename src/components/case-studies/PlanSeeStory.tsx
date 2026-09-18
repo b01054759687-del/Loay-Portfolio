@@ -224,7 +224,7 @@ export default function PlanSeeStory() {
           beside the chapters, that keeps constructing itself as they scroll
           rather than five separate per-scene icons. */}
       <section className="px-6 py-24 sm:py-32 border-t border-border">
-        <div className="mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-16">
+        <div data-plansee-track className="mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-16">
           <div className="lg:sticky lg:top-24 lg:self-start lg:h-[calc(100vh-7rem)] order-1">
             <PlanSeeBuildVisual stage={activeChapter} />
           </div>
