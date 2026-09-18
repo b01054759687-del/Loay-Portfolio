@@ -54,6 +54,9 @@ export default function CommandCenterDiagram() {
         const cards = section.querySelectorAll<HTMLElement>("[data-stage-card]");
         const light = section.querySelector<SVGCircleElement>("[data-light]");
         const loopPath = section.querySelector<SVGPathElement>("[data-loop-full]");
+        const pulses = section.querySelectorAll<SVGCircleElement>("[data-pulse-ring]");
+        const signal = section.querySelector<SVGCircleElement>("[data-signal]");
+        const sync = section.querySelector<SVGCircleElement>("[data-sync-flash]");
         const tilt = tiltRef.current;
 
         if (reduced) {
@@ -68,21 +71,59 @@ export default function CommandCenterDiagram() {
           gsap.set(arc, { strokeDasharray: len, strokeDashoffset: len });
         });
         gsap.set(cards, { opacity: 0, y: 20 });
+        gsap.set(pulses, { attr: { r: 6 }, opacity: 0 });
+        if (signal) gsap.set(signal, { attr: { r: 6 }, opacity: 0 });
+        if (sync) gsap.set(sync, { attr: { r: 10 }, opacity: 0 });
         if (light) gsap.set(light, { opacity: 0 });
 
         const tl = gsap.timeline({
           scrollTrigger: { trigger: section, start: "top 65%" },
         });
 
+        // 1. Business signal detected — a ping at the Diagnose node before
+        // anything else moves.
+        if (signal) {
+          tl.fromTo(
+            signal,
+            { attr: { r: 6 }, opacity: 0.9 },
+            { attr: { r: 26 }, opacity: 0, duration: 0.55, ease: "power2.out" },
+            0
+          );
+        }
+
+        // 2-5. Diagnose activates -> Decide connects -> Connect synchronizes
+        // -> Prove shows impact, each arc drawing in and pulsing its node
+        // as it lands.
         arcs.forEach((arc, i) => {
-          tl.to(arc, { strokeDashoffset: 0, duration: 0.85, ease: "power2.inOut" }, i * 0.45);
+          const t = i * 0.45 + 0.15;
+          tl.to(arc, { strokeDashoffset: 0, duration: 0.85, ease: "power2.inOut" }, t);
           if (cards[i]) {
-            tl.to(cards[i], { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, i * 0.45 + 0.2);
+            tl.to(cards[i], { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, t + 0.2);
+          }
+          const destination = pulses[(i + 1) % 4];
+          if (destination) {
+            tl.fromTo(
+              destination,
+              { attr: { r: 6 }, opacity: 0.85 },
+              { attr: { r: 30 }, opacity: 0, duration: 0.6, ease: "power2.out" },
+              t + 0.75
+            );
           }
         });
 
+        // Systems synchronized: a soft flash from the center right before
+        // the loop goes into its ambient, always-on state.
+        if (sync) {
+          tl.fromTo(
+            sync,
+            { attr: { r: 10 }, opacity: 0.5 },
+            { attr: { r: 170 }, opacity: 0, duration: 0.9, ease: "power2.out" },
+            ">-0.1"
+          );
+        }
+
         if (light && loopPath) {
-          tl.to(light, { opacity: 1, duration: 0.4 }, "-=0.2");
+          tl.to(light, { opacity: 1, duration: 0.4 }, "-=0.5");
           tl.to(
             light,
             {
@@ -201,16 +242,30 @@ export default function CommandCenterDiagram() {
                   { x: 220, y: 410, warm: false },
                   { x: 30, y: 220, warm: true },
                 ].map((node, i) => (
-                  <circle
-                    key={i}
-                    cx={node.x}
-                    cy={node.y}
-                    r="6"
-                    fill="var(--background)"
-                    stroke={node.warm ? "var(--accent-warm)" : "var(--accent)"}
-                    strokeWidth="2"
-                  />
+                  <g key={i}>
+                    <circle
+                      data-pulse-ring
+                      cx={node.x}
+                      cy={node.y}
+                      r="6"
+                      fill="none"
+                      stroke={node.warm ? "var(--accent-warm)" : "var(--accent)"}
+                      strokeWidth="1.5"
+                      opacity="0"
+                    />
+                    <circle
+                      cx={node.x}
+                      cy={node.y}
+                      r="6"
+                      fill="var(--background)"
+                      stroke={node.warm ? "var(--accent-warm)" : "var(--accent)"}
+                      strokeWidth="2"
+                    />
+                  </g>
                 ))}
+
+                {/* Business signal detected — pings once at the Diagnose node before the loop starts drawing. */}
+                <circle data-signal cx="220" cy="30" r="6" fill="none" stroke="var(--accent)" strokeWidth="1.5" opacity="0" />
 
                 <text x="220" y="212" textAnchor="middle" className="fill-foreground" style={{ fontSize: 15, fontWeight: 600 }}>
                   THE LOOP
@@ -218,6 +273,9 @@ export default function CommandCenterDiagram() {
                 <text x="220" y="232" textAnchor="middle" className="fill-muted" style={{ fontSize: 11 }}>
                   repeats every cycle
                 </text>
+
+                {/* Systems synchronized — one soft flash from the center as the loop goes live. */}
+                <circle data-sync-flash cx="220" cy="220" r="10" fill="none" stroke="var(--accent-warm)" strokeWidth="1" opacity="0" />
 
                 <circle data-light r="7" fill="var(--accent-warm)" opacity="0" />
               </svg>

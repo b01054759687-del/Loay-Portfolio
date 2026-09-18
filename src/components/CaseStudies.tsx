@@ -1,67 +1,143 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { caseStudies } from "@/lib/data";
 import { caseStudyIcons } from "@/lib/case-study-icons";
+import { worldMotifs } from "@/lib/world-motifs";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 
 export default function CaseStudies() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const mm = gsap.matchMedia();
+
+    mm.add(
+      {
+        reduced: "(prefers-reduced-motion: reduce)",
+        full: "(prefers-reduced-motion: no-preference)",
+      },
+      (context) => {
+        const { reduced } = context.conditions as { reduced: boolean };
+        const cards = section.querySelectorAll<HTMLElement>("[data-world-card]");
+        const lines = section.querySelectorAll<SVGGeometryElement>("[data-reveal-line]");
+
+        if (reduced) {
+          gsap.set(cards, { opacity: 1, y: 0 });
+          gsap.set(lines, { strokeDashoffset: 0 });
+          return;
+        }
+
+        gsap.set(cards, { opacity: 0, y: 28 });
+
+        gsap.to(cards, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power3.out",
+          stagger: 0.08,
+          scrollTrigger: { trigger: section, start: "top 78%" },
+        });
+
+        cards.forEach((card) => {
+          const cardLines = card.querySelectorAll<SVGGeometryElement>("[data-reveal-line]");
+          cardLines.forEach((line) => {
+            const len = line.getTotalLength();
+            gsap.fromTo(
+              line,
+              { strokeDasharray: len, strokeDashoffset: len },
+              {
+                strokeDashoffset: 0,
+                duration: 1,
+                ease: "power2.inOut",
+                scrollTrigger: { trigger: card, start: "top 80%" },
+              }
+            );
+          });
+        });
+
+        ScrollTrigger.refresh();
+      }
+    );
+
+    return () => mm.revert();
+  }, []);
+
   return (
-    <section id="case-studies" className="px-6 py-24 sm:py-32 border-t border-border">
+    <section id="case-studies" ref={sectionRef} className="px-6 py-24 sm:py-32 border-t border-border">
       <div className="mx-auto max-w-6xl">
         <div className="max-w-2xl mb-14">
-          <p className="text-sm uppercase tracking-[0.3em] text-muted mb-4">Case Studies</p>
+          <p className="text-sm uppercase tracking-[0.3em] text-muted mb-4">Growth Worlds</p>
           <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight">
-            Growth systems, not campaign screenshots.
+            Different business, different world — same operating system.
           </h2>
           <p className="mt-4 text-muted leading-relaxed">
-            Each case study walks through how a system was built — the constraint, the build, and the
-            measured business outcome.
+            Each world is a real business environment Loay built a growth system inside — the
+            constraint, the build, and the measured outcome, not a campaign screenshot.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {caseStudies.map((study) => {
             const Icon = caseStudyIcons[study.slug];
+            const motif = worldMotifs[study.slug];
+            const live = study.status === "live";
             return (
-            <Link
-              key={study.slug}
-              href={study.href}
-              className="group relative flex flex-col justify-between rounded-2xl border border-border bg-surface p-8 min-h-[260px] transition-colors hover:border-foreground/30"
-            >
-              <div>
-                <div className="flex items-center justify-between gap-4 mb-4">
-                  <span className="flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-muted">
-                    {Icon && <Icon size={14} className="shrink-0" aria-hidden="true" />}
-                    {study.client}
-                  </span>
-                  {study.status === "coming-soon" ? (
-                    <span className="text-xs px-2.5 py-1 rounded-full border border-border text-muted">
-                      Coming in Phase 2
-                    </span>
-                  ) : (
-                    <span className="text-xs px-2.5 py-1 rounded-full bg-accent/15 text-accent">
-                      Live case study
-                    </span>
-                  )}
+              <Link
+                key={study.slug}
+                href={study.href}
+                data-world-card
+                className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border bg-surface min-h-[320px] transition-colors hover:border-foreground/30"
+              >
+                <div className="relative h-32 border-b border-border overflow-hidden">
+                  <div className={`absolute inset-0 transition-opacity duration-300 ${live ? "opacity-90 group-hover:opacity-100" : "opacity-40 group-hover:opacity-60"}`}>
+                    {motif}
+                  </div>
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-surface via-surface/10 to-transparent" />
                 </div>
-                <h3 className="text-xl font-semibold tracking-tight leading-snug">{study.title}</h3>
-                <p className="mt-3 text-sm text-muted leading-relaxed">{study.oneLiner}</p>
-              </div>
 
-              <div className="mt-6 flex flex-wrap gap-2">
-                {study.focus.map((f) => (
-                  <span key={f} className="text-xs px-2.5 py-1 rounded-full border border-border text-muted">
-                    {f}
-                  </span>
-                ))}
-              </div>
+                <div className="flex-1 flex flex-col justify-between p-8 pt-6">
+                  <div>
+                    <div className="flex items-center justify-between gap-4 mb-4">
+                      <span className="flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-muted">
+                        {Icon && <Icon size={14} className="shrink-0" aria-hidden="true" />}
+                        {study.client}
+                      </span>
+                      {live ? (
+                        <span className="text-xs px-2.5 py-1 rounded-full bg-accent/15 text-accent">
+                          Live world
+                        </span>
+                      ) : (
+                        <span className="text-xs px-2.5 py-1 rounded-full border border-border text-muted">
+                          Opens in Phase 2
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-xl font-semibold tracking-tight leading-snug">{study.title}</h3>
+                    <p className="mt-3 text-sm text-muted leading-relaxed">{study.oneLiner}</p>
+                  </div>
 
-              {study.status === "live" && (
-                <ArrowUpRight
-                  size={18}
-                  className="absolute top-8 right-8 text-muted transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-foreground"
-                />
-              )}
-            </Link>
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    {study.focus.map((f) => (
+                      <span key={f} className="text-xs px-2.5 py-1 rounded-full border border-border text-muted">
+                        {f}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {live && (
+                  <ArrowUpRight
+                    size={18}
+                    className="absolute top-8 right-8 text-muted transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-foreground"
+                  />
+                )}
+              </Link>
             );
           })}
         </div>
