@@ -35,6 +35,7 @@ const stages = [
 
 export default function CommandCenterDiagram() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const tiltRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -53,6 +54,7 @@ export default function CommandCenterDiagram() {
         const cards = section.querySelectorAll<HTMLElement>("[data-stage-card]");
         const light = section.querySelector<SVGCircleElement>("[data-light]");
         const loopPath = section.querySelector<SVGPathElement>("[data-loop-full]");
+        const tilt = tiltRef.current;
 
         if (reduced) {
           gsap.set(arcs, { strokeDashoffset: 0 });
@@ -93,6 +95,42 @@ export default function CommandCenterDiagram() {
           );
         }
 
+        // Depth: the loop drifts opposite the page scroll (parallax), and
+        // gently tilts in 3D toward the cursor — a cheap stand-in for real
+        // depth that doesn't require a WebGL scene for a static SVG loop.
+        if (tilt) {
+          gsap.to(tilt, {
+            y: -24,
+            ease: "none",
+            scrollTrigger: { trigger: section, start: "top bottom", end: "bottom top", scrub: 0.6 },
+          });
+
+          const bounds = () => tilt.getBoundingClientRect();
+          const onMove = (e: MouseEvent) => {
+            const rect = bounds();
+            const px = (e.clientX - rect.left) / rect.width - 0.5;
+            const py = (e.clientY - rect.top) / rect.height - 0.5;
+            gsap.to(tilt, {
+              rotateY: px * 14,
+              rotateX: -py * 14,
+              duration: 0.5,
+              ease: "power2.out",
+              overwrite: "auto",
+            });
+          };
+          const onLeave = () => {
+            gsap.to(tilt, { rotateX: 0, rotateY: 0, duration: 0.6, ease: "power3.out", overwrite: "auto" });
+          };
+
+          tilt.addEventListener("mousemove", onMove);
+          tilt.addEventListener("mouseleave", onLeave);
+
+          return () => {
+            tilt.removeEventListener("mousemove", onMove);
+            tilt.removeEventListener("mouseleave", onLeave);
+          };
+        }
+
         ScrollTrigger.refresh();
       }
     );
@@ -119,69 +157,71 @@ export default function CommandCenterDiagram() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-12 items-center">
-          <div className="relative mx-auto w-full max-w-[380px]">
-            <svg viewBox="0 0 520 520" className="w-full h-auto" aria-hidden="true">
-              <path
-                data-loop-full
-                d="M260,70 A190,190 0 0,1 450,260 A190,190 0 0,1 260,450 A190,190 0 0,1 70,260 A190,190 0 0,1 260,70"
-                fill="none"
-                stroke="none"
-              />
-              <path
-                data-loop-arc
-                d="M260,70 A190,190 0 0,1 450,260"
-                fill="none"
-                stroke="var(--accent)"
-                strokeWidth="2"
-              />
-              <path
-                data-loop-arc
-                d="M450,260 A190,190 0 0,1 260,450"
-                fill="none"
-                stroke="var(--accent)"
-                strokeWidth="2"
-              />
-              <path
-                data-loop-arc
-                d="M260,450 A190,190 0 0,1 70,260"
-                fill="none"
-                stroke="var(--accent)"
-                strokeWidth="2"
-              />
-              <path
-                data-loop-arc
-                d="M70,260 A190,190 0 0,1 260,70"
-                fill="none"
-                stroke="var(--accent-warm)"
-                strokeWidth="2.6"
-              />
-
-              {[
-                { x: 260, y: 70, warm: false },
-                { x: 450, y: 260, warm: false },
-                { x: 260, y: 450, warm: false },
-                { x: 70, y: 260, warm: true },
-              ].map((node, i) => (
-                <circle
-                  key={i}
-                  cx={node.x}
-                  cy={node.y}
-                  r="6"
-                  fill="var(--background)"
-                  stroke={node.warm ? "var(--accent-warm)" : "var(--accent)"}
+          <div className="[perspective:800px] mx-auto w-full max-w-[380px]">
+            <div ref={tiltRef} className="relative [transform-style:preserve-3d] will-change-transform">
+              <svg viewBox="0 0 440 440" className="w-full h-auto" aria-hidden="true">
+                <path
+                  data-loop-full
+                  d="M220,30 A190,190 0 0,1 410,220 A190,190 0 0,1 220,410 A190,190 0 0,1 30,220 A190,190 0 0,1 220,30"
+                  fill="none"
+                  stroke="none"
+                />
+                <path
+                  data-loop-arc
+                  d="M220,30 A190,190 0 0,1 410,220"
+                  fill="none"
+                  stroke="var(--accent)"
                   strokeWidth="2"
                 />
-              ))}
+                <path
+                  data-loop-arc
+                  d="M410,220 A190,190 0 0,1 220,410"
+                  fill="none"
+                  stroke="var(--accent)"
+                  strokeWidth="2"
+                />
+                <path
+                  data-loop-arc
+                  d="M220,410 A190,190 0 0,1 30,220"
+                  fill="none"
+                  stroke="var(--accent)"
+                  strokeWidth="2"
+                />
+                <path
+                  data-loop-arc
+                  d="M30,220 A190,190 0 0,1 220,30"
+                  fill="none"
+                  stroke="var(--accent-warm)"
+                  strokeWidth="2.6"
+                />
 
-              <text x="260" y="252" textAnchor="middle" className="fill-foreground" style={{ fontSize: 15, fontWeight: 600 }}>
-                THE LOOP
-              </text>
-              <text x="260" y="272" textAnchor="middle" className="fill-muted" style={{ fontSize: 11 }}>
-                repeats every cycle
-              </text>
+                {[
+                  { x: 220, y: 30, warm: false },
+                  { x: 410, y: 220, warm: false },
+                  { x: 220, y: 410, warm: false },
+                  { x: 30, y: 220, warm: true },
+                ].map((node, i) => (
+                  <circle
+                    key={i}
+                    cx={node.x}
+                    cy={node.y}
+                    r="6"
+                    fill="var(--background)"
+                    stroke={node.warm ? "var(--accent-warm)" : "var(--accent)"}
+                    strokeWidth="2"
+                  />
+                ))}
 
-              <circle data-light r="7" fill="var(--accent-warm)" opacity="0" />
-            </svg>
+                <text x="220" y="212" textAnchor="middle" className="fill-foreground" style={{ fontSize: 15, fontWeight: 600 }}>
+                  THE LOOP
+                </text>
+                <text x="220" y="232" textAnchor="middle" className="fill-muted" style={{ fontSize: 11 }}>
+                  repeats every cycle
+                </text>
+
+                <circle data-light r="7" fill="var(--accent-warm)" opacity="0" />
+              </svg>
+            </div>
           </div>
 
           <ol className="grid grid-cols-1 sm:grid-cols-2 gap-4">
