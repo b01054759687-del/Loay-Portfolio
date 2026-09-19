@@ -3,11 +3,16 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { motion, type Variants } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import { profile } from "@/lib/data";
 import HeroField from "@/components/HeroField";
 import { gsap } from "@/lib/gsap";
+
+// three.js is heavy and WebGL-only: keep it out of the initial bundle and
+// off the server entirely.
+const HeroScene = dynamic(() => import("@/components/HeroScene"), { ssr: false });
 
 const headline = profile.tagline.split(" ");
 
@@ -103,7 +108,7 @@ export default function Hero() {
       </div>
 
       <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_auto]">
-        <div className="order-2 text-center lg:order-1 lg:text-left">
+        <div className="relative z-10 order-2 text-center lg:order-1 lg:text-left">
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -164,7 +169,7 @@ export default function Hero() {
           initial={{ opacity: 0, scale: 0.96, y: 12 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] as const }}
-          className="order-1 mx-auto w-full max-w-[320px] sm:max-w-[380px] lg:order-2 lg:mx-0 lg:w-[380px] [perspective:1000px]"
+          className="relative order-1 mx-auto w-full max-w-[320px] sm:max-w-[380px] lg:order-2 lg:mx-0 lg:w-[380px] [perspective:1000px]"
         >
           <div ref={tiltRef} className="relative [transform-style:preserve-3d] will-change-transform">
             {/* Receives the converging streams: an ambient ring that pulses
@@ -186,6 +191,13 @@ export default function Hero() {
               />
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/30 via-transparent to-transparent" />
             </div>
+          </div>
+          {/* Layered over the portrait; HeroScene's depth-only plane hides
+              whatever orbits behind it. The -inset values are in % of the
+              portrait so the scene scales with it — PORTRAIT_W/H in
+              HeroScene.tsx assume exactly these (canvas = 172% x 132% of it). */}
+          <div aria-hidden="true" className="pointer-events-none absolute -inset-x-[36%] -inset-y-[16%]">
+            <HeroScene />
           </div>
         </motion.div>
       </div>
