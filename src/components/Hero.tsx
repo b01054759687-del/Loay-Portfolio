@@ -1,213 +1,116 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import Image from "next/image";
+import { useRef } from "react";
 import Link from "next/link";
-import dynamic from "next/dynamic";
-import { motion, type Variants } from "framer-motion";
-import { ArrowDown } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { profile } from "@/lib/data";
-import HeroField from "@/components/HeroField";
-import { gsap } from "@/lib/gsap";
+import { useAnchor } from "@/lib/universe";
 
-// three.js is heavy and WebGL-only: keep it out of the initial bundle and
-// off the server entirely.
-const HeroScene = dynamic(() => import("@/components/HeroScene"), { ssr: false });
-
+const ease = [0.16, 1, 0.3, 1] as const;
 const headline = profile.tagline.split(" ");
+const accentWords = new Set(["Media,", "Data", "&", "AI"]);
 
-const container: Variants = {
-  hidden: {},
-  show: {
-    transition: { staggerChildren: 0.06 },
-  },
-};
-
-const word: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const },
-  },
-};
-
+// Act I — the signal. No portrait, no numbers: the headline arrives through
+// a masked line reveal while the Growth Core (a WebGL orb pinned to the
+// anchor on the right) breathes and follows the cursor.
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
-  const bgRef = useRef<HTMLDivElement>(null);
-  const tiltRef = useRef<HTMLDivElement>(null);
-
-  // Depth between layers: the background field drifts opposite the
-  // portrait on both scroll and cursor movement, and the portrait itself
-  // tilts toward the cursor — the same cheap 2D-transform technique already
-  // proven in CommandCenterDiagram, reused here rather than reinvented.
-  useEffect(() => {
-    const section = sectionRef.current;
-    const bg = bgRef.current;
-    const tilt = tiltRef.current;
-    if (!section || !bg || !tilt) return;
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const glow = section.querySelector<HTMLElement>("[data-portrait-glow]");
-    if (glow) {
-      gsap.to(glow, {
-        opacity: 0.9,
-        duration: 2.4,
-        ease: "sine.inOut",
-        repeat: -1,
-        yoyo: true,
-      });
-    }
-
-    const onMove = (e: MouseEvent) => {
-      const rect = section.getBoundingClientRect();
-      const px = (e.clientX - rect.left) / rect.width - 0.5;
-      const py = (e.clientY - rect.top) / rect.height - 0.5;
-
-      gsap.to(bg, {
-        x: px * -18,
-        y: py * -12,
-        duration: 0.9,
-        ease: "power2.out",
-        overwrite: "auto",
-      });
-      gsap.to(tilt, {
-        rotateY: px * 10,
-        rotateX: -py * 10,
-        x: px * 10,
-        duration: 0.6,
-        ease: "power2.out",
-        overwrite: "auto",
-      });
-    };
-
-    const onLeave = () => {
-      gsap.to(bg, { x: 0, y: 0, duration: 0.8, ease: "power3.out", overwrite: "auto" });
-      gsap.to(tilt, { rotateX: 0, rotateY: 0, x: 0, duration: 0.8, ease: "power3.out", overwrite: "auto" });
-    };
-
-    section.addEventListener("mousemove", onMove);
-    section.addEventListener("mouseleave", onLeave);
-    return () => {
-      section.removeEventListener("mousemove", onMove);
-      section.removeEventListener("mouseleave", onLeave);
-    };
-  }, []);
+  const coreAnchor = useAnchor("core");
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
+  const textY = useTransform(scrollYProgress, [0, 1], [0, -90]);
+  const textOpacity = useTransform(scrollYProgress, [0, 0.55], [1, 0]);
 
   return (
     <section
       id="top"
       ref={sectionRef}
-      className="relative min-h-screen flex flex-col justify-center px-6 pt-28 pb-20 overflow-hidden"
+      className="relative flex min-h-[100svh] items-center px-6 pt-24 pb-20"
     >
-      <div ref={bgRef} className="pointer-events-none absolute inset-0 -z-10 will-change-transform">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(79,107,255,0.14),transparent_55%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] bg-[size:64px_64px] opacity-[0.15] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_30%,black,transparent)]" />
-        <HeroField />
-      </div>
-
-      <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_auto]">
-        <div className="relative z-10 order-2 text-center lg:order-1 lg:text-left">
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+        <motion.div
+          style={{ y: textY, opacity: textOpacity }}
+          className="relative z-10 order-2 text-center lg:order-1 lg:text-left"
+        >
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-6 text-sm uppercase tracking-[0.3em] text-muted"
+            transition={{ duration: 0.7, ease }}
+            className="mb-7 inline-flex items-center justify-center gap-3 text-[11px] uppercase tracking-[0.22em] text-muted sm:text-sm sm:tracking-[0.3em]"
           >
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+            </span>
             {profile.role}
           </motion.p>
 
-          <motion.h1
-            variants={container}
-            initial="hidden"
-            animate="show"
-            className="font-display text-4xl sm:text-6xl lg:text-6xl font-semibold leading-tight tracking-tight"
-          >
+          <h1 className="font-display text-[2.6rem] font-semibold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
             {headline.map((w, i) => (
-              <motion.span key={i} variants={word} className="inline-block mr-3">
-                {["Media,", "Data", "&", "AI"].includes(w) ? (
-                  <span className="text-gradient">{w}</span>
-                ) : (
-                  w
-                )}
-              </motion.span>
+              <span key={i} className="mr-[0.24em] inline-block overflow-hidden pb-[0.16em] align-bottom -mb-[0.16em]">
+                <motion.span
+                  className="inline-block"
+                  initial={{ y: "115%" }}
+                  animate={{ y: 0 }}
+                  transition={{ duration: 1, ease, delay: 0.25 + i * 0.07 }}
+                >
+                  {accentWords.has(w) ? <span className="text-gradient">{w}</span> : w}
+                </motion.span>
+              </span>
             ))}
-          </motion.h1>
+          </h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="mt-8 max-w-2xl text-base sm:text-lg text-muted leading-relaxed mx-auto lg:mx-0"
+            transition={{ duration: 0.8, ease, delay: 0.9 }}
+            className="mx-auto mt-8 max-w-xl text-base leading-relaxed text-muted sm:text-lg lg:mx-0"
           >
             {profile.supportingText}
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
+            transition={{ duration: 0.8, ease, delay: 1.1 }}
             className="mt-10 flex flex-wrap justify-center gap-4 lg:justify-start"
           >
             <Link
               href={profile.ctaPrimary.href}
-              className="px-6 py-3 rounded-full bg-foreground text-background font-medium hover:opacity-90 transition-opacity"
+              className="group inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 font-medium text-background transition-transform hover:scale-[1.03]"
             >
               {profile.ctaPrimary.label}
+              <span className="transition-transform group-hover:translate-y-0.5">↓</span>
             </Link>
             <a
               href={profile.ctaSecondary.href}
-              className="px-6 py-3 rounded-full border border-border hover:border-foreground/50 transition-colors"
+              className="rounded-full border border-white/15 px-6 py-3 backdrop-blur-sm transition-colors hover:border-foreground/50"
             >
               {profile.ctaSecondary.label}
             </a>
           </motion.div>
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96, y: 12 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] as const }}
-          className="relative order-1 mx-auto w-full max-w-[320px] sm:max-w-[380px] lg:order-2 lg:mx-0 lg:w-[380px] [perspective:1000px]"
-        >
-          <div ref={tiltRef} className="relative [transform-style:preserve-3d] will-change-transform">
-            {/* Receives the converging streams: an ambient ring that pulses
-                on its own slow cycle, so arrival at the portrait reads as
-                intentional rather than the lines just stopping. */}
-            <div
-              data-portrait-glow
-              className="pointer-events-none absolute -inset-3 rounded-[2.5rem] opacity-60"
-              style={{ boxShadow: "0 0 70px 8px color-mix(in srgb, var(--accent) 35%, transparent)" }}
-            />
-            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2rem] ring-1 ring-accent/30 shadow-[0_0_60px_-15px_rgba(79,107,255,0.4)]">
-              <Image
-                src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/images/loay-portrait.jpg`}
-                alt={profile.name}
-                fill
-                priority
-                sizes="(min-width: 1024px) 380px, 320px"
-                className="object-cover object-top"
-              />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/30 via-transparent to-transparent" />
-            </div>
-          </div>
-          {/* Layered over the portrait; HeroScene's depth-only plane hides
-              whatever orbits behind it. The -inset values are in % of the
-              portrait so the scene scales with it — PORTRAIT_W/H in
-              HeroScene.tsx assume exactly these (canvas = 172% x 132% of it). */}
-          <div aria-hidden="true" className="pointer-events-none absolute -inset-x-[36%] -inset-y-[16%]">
-            <HeroScene />
-          </div>
         </motion.div>
+
+        <div
+          ref={coreAnchor}
+          data-core-scale="0.36"
+          className="relative order-1 mx-auto aspect-square w-[min(68vw,38vh)] lg:order-2 lg:w-full lg:max-w-[520px]"
+        >
+          <div className="universe-fallback absolute inset-[14%] rounded-full bg-[radial-gradient(circle_at_35%_30%,#7a5cff,#4f6bff_45%,#0a0a0c_78%)] shadow-[0_0_120px_20px_rgba(79,107,255,0.35)]" />
+        </div>
       </div>
 
       <motion.div
-        animate={{ y: [0, 8, 0] }}
-        transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-muted"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2, duration: 1 }}
+        className="pointer-events-none absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-3 text-[11px] uppercase tracking-[0.3em] text-muted"
       >
-        <ArrowDown size={20} />
+        <span>Scroll to assemble the system</span>
+        <motion.span
+          animate={{ scaleY: [0.2, 1, 0.2], originY: 0 }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+          className="h-10 w-px bg-gradient-to-b from-accent to-transparent"
+        />
       </motion.div>
     </section>
   );

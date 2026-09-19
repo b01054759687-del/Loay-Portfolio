@@ -22,7 +22,7 @@ export default function CaseStudyPlaceholder({ study }: { study: CaseStudy }) {
         </Link>
 
         <span className="inline-flex text-xs px-2.5 py-1 rounded-full border border-border text-muted mb-6">
-          Coming in Phase 2
+          World opening soon
         </span>
 
         <p className="flex items-center gap-2 text-sm uppercase tracking-[0.3em] text-muted mb-4">

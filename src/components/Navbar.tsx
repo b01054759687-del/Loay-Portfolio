@@ -7,8 +7,8 @@ import { Menu, X } from "lucide-react";
 import { profile } from "@/lib/data";
 
 const links = [
-  { label: "Impact", href: "/#impact" },
-  { label: "Case Studies", href: "/#case-studies" },
+  { label: "The Loop", href: "/#operating-system" },
+  { label: "Worlds", href: "/#case-studies" },
 ];
 
 export default function Navbar() {
