@@ -8,6 +8,7 @@ import { planseeMeta, chapters, type Chapter } from "@/lib/plansee";
 import { profile } from "@/lib/data";
 import { caseStudyIcons } from "@/lib/case-study-icons";
 import PlanSeeBuildVisual from "./PlanSeeBuildVisual";
+import PlanSeeLogo from "./PlanSeeLogo";
 
 const chapterTint: Record<string, string> = {
   before: "rgba(150,150,159,0.10)",
@@ -200,6 +201,10 @@ export default function PlanSeeStory() {
             All case studies
           </Link>
 
+          <div className="mb-8">
+            <PlanSeeLogo />
+          </div>
+
           <p className="flex items-center gap-2 text-sm uppercase tracking-[0.3em] text-muted mb-4">
             <PlanSeeIcon size={16} className="shrink-0" aria-hidden="true" />
             {planseeMeta.client} — {planseeMeta.period} — Interior Design &amp; Finishing
@@ -220,12 +225,12 @@ export default function PlanSeeStory() {
         </div>
       </section>
 
-      {/* Blueprint becomes built space: one continuous illustration, pinned
-          beside the chapters, that keeps constructing itself as they scroll
-          rather than five separate per-scene icons. */}
-      <section className="px-6 py-24 sm:py-32 border-t border-border">
-        <div data-plansee-track className="mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-16">
-          <div className="lg:sticky lg:top-24 lg:self-start lg:h-[calc(100vh-7rem)] order-1">
+      {/* One unit, finished in front of the reader: pinned beside the chapters
+          on desktop, and pinned above them on mobile, so it keeps being
+          finished as they scroll. */}
+      <section className="px-6 py-16 sm:py-32 border-t border-border">
+        <div className="mx-auto max-w-6xl flex flex-col gap-6 lg:grid lg:grid-cols-[1fr_1fr] lg:gap-16">
+          <div className="sticky top-16 z-20 order-1 h-[44vh] bg-background pb-3 lg:top-24 lg:h-[calc(100vh-7rem)] lg:self-start lg:bg-transparent lg:pb-0">
             <PlanSeeBuildVisual stage={activeChapter} />
           </div>
 

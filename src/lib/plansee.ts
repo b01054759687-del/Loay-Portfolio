@@ -10,6 +10,9 @@ export const planseeMeta = {
   clientDescription: "An in-house interior design company — 120+ employees, 5+ years in the market, 290 clients served.",
   role: "Marketing Specialist → Senior Marketing Specialist",
   period: "Jun 2024 – Present",
+  // Set to the official logo path under /public (e.g. "/images/plansee/logo.png")
+  // once the file is supplied.
+  logoSrc: undefined as string | undefined,
   heroStat: { value: "1,982", label: "qualified leads generated from a marketing function that didn't exist yet" },
 };
 
